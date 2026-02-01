@@ -156,5 +156,5 @@
 
 | Syntax | Command | Command2 |
 |---|--|--|
-| ASCII Syntax: | AGRICA 1 | AGRICA COM2 1 |
-| Binary Syntax: | AGRICB 1 | AGRICB COM2 1 |
+| ASCII Syntax: | AGRICA 10 | AGRICA COM2 1 |
+| Binary Syntax: | AGRICB 10 | AGRICB COM2 1 |

@@ -67,6 +67,33 @@ void UM982Parser::begin(Stream &input, float antennaHeightMeters)
     _input = &input;
     _antennaHeightMeters = antennaHeightMeters;
     reset();
+
+    _input->print("UNLOG\r\n");
+    _input->print("CONFIG ANTENNA POWERON\r\n");
+    _input->print("CONFIG NMEAVERSION V410\r\n");
+    _input->print("CONFIG RTK TIMEOUT 600\r\n");
+    _input->print("CONFIG RTK RELIABILITY 3 1\r\n");
+    _input->print("CONFIG PPP TIMEOUT 300\r\n");
+    _input->print("CONFIG SMOOTH RTKHEIGHT 0\r\n");
+    _input->print("CONFIG HEADING OFFSET 90.0 0.0\r\n");
+    _input->print("CONFIG HEADING RELIABILITY 3\r\n");
+    _input->print("CONFIG HEADING TRACTOR\r\n");
+    _input->print("CONFIG HEADING VARIABLELENGTH\r\n");
+    _input->print("CONFIG DGPS TIMEOUT 600\r\n");
+    _input->print("CONFIG RTCMB1CB2A ENABLE\r\n");
+    _input->print("CONFIG SMOOTH HEADING 0\r\n");
+    _input->print("CONFIG ANTENNADELTAHEN 0.0000 0.0000 0.0000\r\n");
+    _input->print("CONFIG SBAS DISABLE\r\n");
+    _input->print("CONFIG PPS ENABLE GPS POSITIVE 500000 1000 0 0\r\n");
+    _input->print("CONFIG MMP ENABLE\r\n");
+    _input->print("CONFIG SIGNALGROUP 4 5\r\n");
+    _input->print("CONFIG ANTIJAM AUTO\r\n");
+    _input->print("CONFIG AGNSS DISABLE\r\n");
+    _input->print("CONFIG COM1 460800\r\n");
+    _input->print("CONFIG COM2 460800\r\n");
+    _input->print("CONFIG COM3 460800\r\n");
+    _input->print("MODE ROVER SURVEY\r\n");
+    _input->print("AGRICB 0.1\r\n");
 }
 
 void UM982Parser::reset()
@@ -174,6 +201,32 @@ bool UM982Parser::decodeAgricToPanda(const UM982Message &message, UM982PandaData
     outData.hdop = NAN;
     outData.dgpsAgeSeconds = NAN;
     outData.yawRateDegPerSec = NAN;
+
+    if (std::isfinite(_antennaHeightMeters) && _antennaHeightMeters > 0.0f &&
+        std::isfinite(outData.rollDegrees) && std::isfinite(outData.headingDegrees) &&
+        std::isfinite(outData.latitudeDegrees) && std::isfinite(outData.longitudeDegrees))
+    {
+        const double rollRad = static_cast<double>(outData.rollDegrees) * (M_PI / 180.0);
+        const double headingRad = static_cast<double>(outData.headingDegrees) * (M_PI / 180.0);
+
+        const double lateralOffset = static_cast<double>(_antennaHeightMeters) * std::sin(rollRad);
+        const double verticalOffset = static_cast<double>(_antennaHeightMeters) * std::cos(rollRad);
+
+        const double dNorth = -lateralOffset * std::sin(headingRad);
+        const double dEast = lateralOffset * std::cos(headingRad);
+
+        constexpr double kEarthRadiusMeters = 6378137.0;
+        const double latRad = outData.latitudeDegrees * (M_PI / 180.0);
+        const double dLat = dNorth / kEarthRadiusMeters;
+        const double dLon = dEast / (kEarthRadiusMeters * std::cos(latRad));
+
+        outData.latitudeDegrees += dLat * (180.0 / M_PI);
+        outData.longitudeDegrees += dLon * (180.0 / M_PI);
+        if (std::isfinite(outData.altitudeMeters))
+        {
+            outData.altitudeMeters = static_cast<float>(outData.altitudeMeters - verticalOffset);
+        }
+    }
 
     return true;
 }
