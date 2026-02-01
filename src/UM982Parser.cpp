@@ -153,6 +153,26 @@ bool UM982Parser::decodeAgricToPanda(const UM982Message &message, UM982PandaData
     outData.longitudeDegrees = readLeDouble(payload + 88);
     outData.altitudeMeters = static_cast<float>(readLeDouble(payload + 96));
 
+    const bool latLonZero = (std::fabs(outData.latitudeDegrees) < 1e-6) && (std::fabs(outData.longitudeDegrees) < 1e-6);
+    const bool latLonOutOfRange = (std::fabs(outData.latitudeDegrees) > 90.0) || (std::fabs(outData.longitudeDegrees) > 180.0);
+    if ((latLonZero || latLonOutOfRange) && outData.satellites > 0)
+    {
+        const double latBe = readBeDouble(payload + 80);
+        const double lonBe = readBeDouble(payload + 88);
+        const float altBe = static_cast<float>(readBeDouble(payload + 96));
+        if (std::fabs(latBe) <= 90.0 && std::fabs(lonBe) <= 180.0)
+        {
+            outData.latitudeDegrees = latBe;
+            outData.longitudeDegrees = lonBe;
+            outData.altitudeMeters = altBe;
+            outData.headingDegrees = readBeFloat(payload + 40);
+            outData.pitchDegrees = readBeFloat(payload + 44);
+            outData.rollDegrees = readBeFloat(payload + 48);
+            const float speedBe = readBeFloat(payload + 52);
+            outData.speedKnots = speedBe * 1.943844f;
+        }
+    }
+
     outData.hdop = NAN;
     outData.dgpsAgeSeconds = NAN;
     outData.yawRateDegPerSec = NAN;
@@ -308,7 +328,9 @@ bool UM982Parser::parseHeader()
     _message.header.sync3 = _headerBuffer[2];
     _message.header.cpuIdle = _headerBuffer[3];
     _message.header.messageId = readLe16(&_headerBuffer[4]);
-    _message.header.messageLength = readLe16(&_headerBuffer[6]);
+    const uint16_t lengthLe = readLe16(&_headerBuffer[6]);
+    const uint16_t lengthBe = static_cast<uint16_t>(_headerBuffer[6]) << 8 | static_cast<uint16_t>(_headerBuffer[7]);
+    _message.header.messageLength = lengthLe;
     _message.header.timeRef = _headerBuffer[8];
     _message.header.timeStatus = _headerBuffer[9];
     _message.header.week = readLe16(&_headerBuffer[10]);
@@ -318,11 +340,24 @@ bool UM982Parser::parseHeader()
     _message.header.leapSeconds = _headerBuffer[21];
     _message.header.delayMs = readLe16(&_headerBuffer[22]);
 
-    _message.payloadLength = _message.header.messageLength;
-    if (_message.payloadLength > kMaxPayload)
+    uint16_t payloadLength = _message.header.messageLength;
+    if (payloadLength > kMaxPayload && lengthBe <= kMaxPayload)
+    {
+        payloadLength = lengthBe;
+        _message.header.messageLength = lengthBe;
+    }
+
+    if (payloadLength > kMaxPayload && payloadLength >= kCrcLength && (payloadLength - kCrcLength) <= kMaxPayload)
+    {
+        payloadLength = static_cast<uint16_t>(payloadLength - kCrcLength);
+    }
+
+    if (payloadLength > kMaxPayload)
     {
         return false;
     }
+
+    _message.payloadLength = payloadLength;
 
     return true;
 }
@@ -373,6 +408,22 @@ double UM982Parser::readLeDouble(const uint8_t *data)
 {
     double value = 0.0;
     uint8_t buffer[8] = {data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]};
+    memcpy(&value, buffer, sizeof(value));
+    return value;
+}
+
+float UM982Parser::readBeFloat(const uint8_t *data)
+{
+    float value = 0.0f;
+    uint8_t buffer[4] = {data[3], data[2], data[1], data[0]};
+    memcpy(&value, buffer, sizeof(value));
+    return value;
+}
+
+double UM982Parser::readBeDouble(const uint8_t *data)
+{
+    double value = 0.0;
+    uint8_t buffer[8] = {data[7], data[6], data[5], data[4], data[3], data[2], data[1], data[0]};
     memcpy(&value, buffer, sizeof(value));
     return value;
 }
