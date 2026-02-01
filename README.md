@@ -7,7 +7,7 @@ This repository contains a PlatformIO/Arduino C++ parser for UniCore UM982/UM98x
 - Validates the 32-bit CRC for each message.
 - Decodes AGRIC payload fields into a structured `UM982PandaData` record.
 - Formats output as a `$PANDA` sentence (GGA-like) with checksum.
-- Optionally applies antenna-height + roll correction to compute ground position.
+- Optionally applies antenna-height + roll correction to compute ground position at time of sample
 
 ## Repository layout
 - [src/UM982Parser.cpp](src/UM982Parser.cpp): parser implementation.
@@ -16,10 +16,26 @@ This repository contains a PlatformIO/Arduino C++ parser for UniCore UM982/UM98x
 - [agent.md](agent.md): working notes and field references.
 
 ## Usage (Arduino/PlatformIO)
-1. Connect the GPS module UART to your board’s `Serial3` (or change to your port).
-2. In `setup()`, call `parser.begin(Serial3, antennaHeightMeters)`.
+1. Connect the GPS module UART to your board’s `Serial3` (typical for AOG, or change to your port).
+2. In `setup()`, call `parser.begin(SerialGPS, antennaHeightMeters)`.
 3. In `loop()`, call `parser.update()` and handle messages.
 
 ## Notes
 - AGRIC content may vary by receiver model/firmware (e.g., single-antenna units may report zeros for some fields).
-- The `$PANDA` sentence is a project-specific, GGA-like format.
+- Seriously/practically, it's for UM982 dual only, hence the name of the library
+- The `$PANDA` sentence is a project-specific, GGA-like format for agOpenGPS.
+
+
+## Performance
+
+Seems speedy enough, decoding in less than 30 microseconds (note values here are zero as I was testing with UM981, my UM982 is away for repair)
+
+```
+$PANDA,154732,0000.0000,N,00000.0000,E,0,0,,0.0,,0.0,0.0,0.0,0.0,*65 Satellites: 0  Parse duration: 27 us
+$PANDA,154732,0000.0000,N,00000.0000,E,0,0,,0.0,,0.0,0.0,0.0,0.0,*65 Satellites: 0  Parse duration: 28 us
+$PANDA,154732,0000.0000,N,00000.0000,E,0,0,,0.0,,0.0,0.0,0.0,0.0,*65 Satellites: 0  Parse duration: 28 us
+$PANDA,154732,0000.0000,N,00000.0000,E,0,0,,0.0,,0.0,0.0,0.0,0.0,*65 Satellites: 0  Parse duration: 27 us
+$PANDA,154732,0000.0000,N,00000.0000,E,0,0,,0.0,,0.0,0.0,0.0,0.0,*65 Satellites: 0  Parse duration: 28 us
+
+```
+
