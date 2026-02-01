@@ -129,9 +129,7 @@ bool UM982Parser::decodeAgricToPanda(const UM982Message &message, UM982PandaData
     outData.timeOfFixHms = static_cast<uint32_t>(hour) * 10000u +
                            static_cast<uint32_t>(minute) * 100u +
                            static_cast<uint32_t>(second);
-
     outData.fixQuality = payload[11];
-
     const uint8_t numGps = payload[13];
     const uint8_t numBds = payload[14];
     const uint8_t numGlo = payload[15];
