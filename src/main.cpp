@@ -2,6 +2,9 @@
 #include "UM982Parser.h"
 
 UM982Parser parser;
+elapsedMicros duration = 0;
+UM982PandaData pandaData;
+String pandaSentence;
 
 void setup()
 {
@@ -12,6 +15,7 @@ void setup()
 
 void loop()
 {
+    duration = 0;
     if (parser.update())
     {
         const UM982Message &msg = parser.message();
@@ -22,12 +26,16 @@ void loop()
         Serial.print(msg.payloadLength);
         Serial.print(" ");
         Serial.println(msg.validCrc ? "  CRC valid" : "  CRC invalid");
-        UM982PandaData pandaData;
         if (parser.decodeAgricToPanda(msg, pandaData))
         {
-            String pandaSentence;
             parser.formatPandaSentence(pandaData, pandaSentence);
-            Serial.println(pandaSentence);
+            Serial.print(pandaSentence);
+            Serial.print(" Satellites: ");
+            Serial.print(pandaData.satellites);
+            Serial.print("  Parse duration: ");
+            Serial.print(duration);
+            Serial.println(" us");
+            duration = 0;
         }
         else
         {
