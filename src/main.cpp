@@ -22,6 +22,17 @@ void loop()
         Serial.print(msg.payloadLength);
         Serial.print(" ");
         Serial.println(msg.validCrc ? "  CRC valid" : "  CRC invalid");
+        UM982PandaData pandaData;
+        if (parser.decodeAgricToPanda(msg, pandaData))
+        {
+            String pandaSentence;
+            parser.formatPandaSentence(pandaData, pandaSentence);
+            Serial.println(pandaSentence);
+        }
+        else
+        {
+            Serial.println("PANDA decode failed");
+        }
         parser.clearMessage();
     }
 }
