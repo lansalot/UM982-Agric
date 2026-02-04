@@ -245,7 +245,7 @@ bool UM982Parser::formatPandaSentence(const UM982PandaData &data, String &outSen
 
     String sentence;
     sentence.reserve(120);
-    sentence += "$PANDA,";
+    sentence += "$PAOGI,";
     sentence += timeBuffer;
     sentence += ",";
     sentence += latBuffer;
