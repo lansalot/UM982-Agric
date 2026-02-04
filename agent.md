@@ -133,7 +133,7 @@
 
 |Field|Information|
 |---|---|
-| $PANDA | Sentence header |
+| $PAOGI | Sentence header |
 | (1) Time of fix | Time of fix (hhmmss) |
 | (2,3) | Latitude 4807.038,N → Latitude 48° 07.038' N |
 | (4,5) | Longitude 01131.000,E → Longitude 11° 31.000' E |

@@ -1,12 +1,12 @@
 # UM982 AGRIC Parser
 
-This repository contains a PlatformIO/Arduino C++ parser for UniCore UM982/UM98x AGRIC binary messages. It reads the UM982 binary stream, validates the CRC, decodes key fields, and can emit a lightweight NMEA-style $PANDA sentence suitable for downstream consumers.
+This repository contains a PlatformIO/Arduino C++ parser for UniCore UM982/UM98x AGRIC binary messages. It reads the UM982 binary stream, validates the CRC, decodes key fields, and can emit a lightweight NMEA-style $PAOGI sentence suitable for downstream consumers.
 
 ## What it does
 - Parses UM982 binary messages with sync bytes `0xAA 0x44 0xB5`.
 - Validates the 32-bit CRC for each message.
-- Decodes AGRIC payload fields into a structured `UM982PandaData` record.
-- Formats output as a `$PANDA` sentence (GGA-like) with checksum.
+- Decodes AGRIC payload fields into a structured `UM982PAOGIData` record.
+- Formats output as a `$PAOGI` sentence (GGA-like) with checksum.
 - Optionally applies antenna-height + roll correction to compute ground position at time of sample
 
 ## Repository layout
@@ -23,7 +23,7 @@ This repository contains a PlatformIO/Arduino C++ parser for UniCore UM982/UM98x
 ## Notes
 - AGRIC content may vary by receiver model/firmware (e.g., single-antenna units may report zeros for some fields).
 - Seriously/practically, it's for UM982 dual only, hence the name of the library
-- The `$PANDA` sentence is a project-specific, GGA-like format for agOpenGPS.
+- The `$PAOGI` sentence is a project-specific, GGA-like format for agOpenGPS.
 
 
 ## Performance
@@ -31,11 +31,11 @@ This repository contains a PlatformIO/Arduino C++ parser for UniCore UM982/UM98x
 Seems speedy enough, decoding in less than 30 microseconds (note values here are zero as I was testing with UM981, my UM982 is away for repair)
 
 ```
-$PANDA,154732,0000.0000,N,00000.0000,E,0,0,,0.0,,0.0,0.0,0.0,0.0,*65 Satellites: 0  Parse duration: 27 us
-$PANDA,154732,0000.0000,N,00000.0000,E,0,0,,0.0,,0.0,0.0,0.0,0.0,*65 Satellites: 0  Parse duration: 28 us
-$PANDA,154732,0000.0000,N,00000.0000,E,0,0,,0.0,,0.0,0.0,0.0,0.0,*65 Satellites: 0  Parse duration: 28 us
-$PANDA,154732,0000.0000,N,00000.0000,E,0,0,,0.0,,0.0,0.0,0.0,0.0,*65 Satellites: 0  Parse duration: 27 us
-$PANDA,154732,0000.0000,N,00000.0000,E,0,0,,0.0,,0.0,0.0,0.0,0.0,*65 Satellites: 0  Parse duration: 28 us
+$PAOGI,154732,0000.0000,N,00000.0000,E,0,0,,0.0,,0.0,0.0,0.0,0.0,*65 Satellites: 0  Parse duration: 27 us
+$PAOGI,154732,0000.0000,N,00000.0000,E,0,0,,0.0,,0.0,0.0,0.0,0.0,*65 Satellites: 0  Parse duration: 28 us
+$PAOGI,154732,0000.0000,N,00000.0000,E,0,0,,0.0,,0.0,0.0,0.0,0.0,*65 Satellites: 0  Parse duration: 28 us
+$PAOGI,154732,0000.0000,N,00000.0000,E,0,0,,0.0,,0.0,0.0,0.0,0.0,*65 Satellites: 0  Parse duration: 27 us
+$PAOGI,154732,0000.0000,N,00000.0000,E,0,0,,0.0,,0.0,0.0,0.0,0.0,*65 Satellites: 0  Parse duration: 28 us
 
 ```
 

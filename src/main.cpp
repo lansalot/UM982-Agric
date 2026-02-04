@@ -3,8 +3,8 @@
 
 UM982Parser parser;
 elapsedMicros duration = 0;
-UM982PandaData pandaData;
-String pandaSentence;
+UM982PAOGIData PAOGIData;
+String PAOGISentence;
 HardwareSerial &SerialGPS = Serial3;
 
 
@@ -28,12 +28,12 @@ void loop()
         // Serial.print(msg.payloadLength);
         // Serial.print(" ");
         // Serial.println(msg.validCrc ? "  CRC valid" : "  CRC invalid");
-        if (parser.decodeAgricToPanda(msg, pandaData))
+        if (parser.decodeAgricToPAOGI(msg, PAOGIData))
         {
-            parser.formatPandaSentence(pandaData, pandaSentence);
-            Serial.print(pandaSentence);
+            parser.formatPAOGISentence(PAOGIData, PAOGISentence);
+            Serial.print(PAOGISentence);
             Serial.print(" Satellites: ");
-            Serial.print(pandaData.satellites);
+            Serial.print(PAOGIData.satellites);
             Serial.print("  Parse duration: ");
             Serial.print(duration);
             Serial.println(" us");
@@ -41,7 +41,7 @@ void loop()
         }
         else
         {
-            Serial.println("PANDA decode failed");
+            Serial.println("PAOGI decode failed");
         }
         parser.clearMessage();
     }

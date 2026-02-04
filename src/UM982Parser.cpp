@@ -141,7 +141,7 @@ void UM982Parser::clearMessage()
     _messageReady = false;
 }
 
-bool UM982Parser::decodeAgricToPanda(const UM982Message &message, UM982PandaData &outData) const
+bool UM982Parser::decodeAgricToPAOGI(const UM982Message &message, UM982PAOGIData &outData) const
 {
     if (message.payloadLength < 96)
     {
@@ -231,7 +231,7 @@ bool UM982Parser::decodeAgricToPanda(const UM982Message &message, UM982PandaData
     return true;
 }
 
-bool UM982Parser::formatPandaSentence(const UM982PandaData &data, String &outSentence)
+bool UM982Parser::formatPAOGISentence(const UM982PAOGIData &data, String &outSentence)
 {
     char latBuffer[16] = {0};
     char lonBuffer[16] = {0};
@@ -270,6 +270,8 @@ bool UM982Parser::formatPandaSentence(const UM982PandaData &data, String &outSen
     sentence += ",";
     appendFloat(sentence, data.headingDegrees, 1);
     sentence += ",";
+    // you could return this as 8888 to prevent AOG calculating the offset?
+    // Position.designer.cs #709
     appendFloat(sentence, data.rollDegrees, 1);
     sentence += ",";
     appendFloat(sentence, data.pitchDegrees, 1);

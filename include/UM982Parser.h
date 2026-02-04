@@ -29,7 +29,7 @@ struct UM982Message
     bool validCrc = false;
 };
 
-struct UM982PandaData
+struct UM982PAOGIData
 {
     uint32_t timeOfFixHms = 0;
     double latitudeDegrees = 0.0;
@@ -59,8 +59,8 @@ public:
     const UM982Message &message() const;
     void clearMessage();
 
-    bool decodeAgricToPanda(const UM982Message &message, UM982PandaData &outData) const;
-    static bool formatPandaSentence(const UM982PandaData &data, String &outSentence);
+    bool decodeAgricToPAOGI(const UM982Message &message, UM982PAOGIData &outData) const;
+    static bool formatPAOGISentence(const UM982PAOGIData &data, String &outSentence);
 
 private:
     enum class State
