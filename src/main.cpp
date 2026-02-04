@@ -12,7 +12,7 @@ void setup()
 {
     Serial.begin(115200);
     SerialGPS.begin(460800);
-    parser.begin(SerialGPS, 1.5); // 1.5m height
+    parser.begin(SerialGPS, 3); // 1.5m height
 }
 
 void loop()

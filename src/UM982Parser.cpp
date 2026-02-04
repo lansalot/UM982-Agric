@@ -270,7 +270,8 @@ bool UM982Parser::formatPAOGISentence(const UM982PAOGIData &data, String &outSen
     sentence += ",";
     appendFloat(sentence, data.headingDegrees, 1);
     sentence += ",";
-    // you could return this as 8888 to prevent AOG calculating the offset?
+    // you could return this as 8888 to prevent AOG calculating the offset, or better yet antenna height in AOG to 0 (that way roll still shows in AOG)?
+    // of course, have to compile antenna height in here temporarily
     // Position.designer.cs #709
     appendFloat(sentence, data.rollDegrees, 1);
     sentence += ",";
