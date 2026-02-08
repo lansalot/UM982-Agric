@@ -24,7 +24,7 @@ void loop()
         if (parser.decodeAgricToPAOGI(msg, PAOGIData))
         {
             parser.formatPAOGISentence(PAOGIData, PAOGISentence);
-            //Serial.println(PAOGISentence);
+            Serial.println(PAOGISentence);
             // Serial.print(" Satellites: ");
             // Serial.print(PAOGIData.satellites);
             // Serial.print("  Parse duration: ");

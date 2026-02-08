@@ -89,8 +89,6 @@ private:
     static uint32_t readLe32(const uint8_t *data);
     static float readLeFloat(const uint8_t *data);
     static double readLeDouble(const uint8_t *data);
-    static float readBeFloat(const uint8_t *data);
-    static double readBeDouble(const uint8_t *data);
     static void formatLatLon(double degrees, bool isLatitude, char *outBuffer, size_t outSize, char &hemisphere);
     static void appendFloat(String &target, float value, uint8_t decimals);
     static uint8_t computeNmeaChecksum(const String &sentence);

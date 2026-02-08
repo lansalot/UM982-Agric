@@ -185,29 +185,6 @@ bool UM982Parser::decodeAgricToPAOGI(const UM982Message &message, UM982PAOGIData
     outData.longitudeDegrees = readLeDouble(payload + 88);
     outData.altitudeMeters = static_cast<float>(readLeDouble(payload + 96));
 
-    const bool latLonZero = (std::fabs(outData.latitudeDegrees) < 1e-6) && (std::fabs(outData.longitudeDegrees) < 1e-6);
-    const bool latLonOutOfRange = (std::fabs(outData.latitudeDegrees) > 90.0) || (std::fabs(outData.longitudeDegrees) > 180.0);
-    if ((latLonZero || latLonOutOfRange) && outData.satellites > 0)
-    {
-        Serial.println("Invalid lat/lon, trying big-endian decode");
-        const double latBe = readBeDouble(payload + 80);
-        Serial.print("Lat (BE): ");
-        Serial.println(latBe, 8);
-        const double lonBe = readBeDouble(payload + 88);
-        const float altBe = static_cast<float>(readBeDouble(payload + 96));
-        if (std::fabs(latBe) <= 90.0 && std::fabs(lonBe) <= 180.0)
-        {
-            outData.latitudeDegrees = latBe;
-            outData.longitudeDegrees = lonBe;
-            outData.altitudeMeters = altBe;
-            outData.headingDegrees = readBeFloat(payload + 40);
-            outData.pitchDegrees = readBeFloat(payload + 44);
-            outData.rollDegrees = readBeFloat(payload + 48);
-            const float speedBe = readBeFloat(payload + 52);
-            outData.speedKnots = speedBe * 1.943844f;
-        }
-    }
-
     outData.hdop = NAN;
     outData.dgpsAgeSeconds = NAN;
     outData.yawRateDegPerSec = NAN;
@@ -217,12 +194,6 @@ bool UM982Parser::decodeAgricToPAOGI(const UM982Message &message, UM982PAOGIData
         std::isfinite(outData.pitchDegrees) && std::isfinite(outData.headingDegrees) &&
         std::isfinite(outData.latitudeDegrees) && std::isfinite(outData.longitudeDegrees))
     {
-        Serial.print("pitch degrees: ");
-        Serial.print(outData.pitchDegrees);
-        Serial.print(" heading degrees: ");
-        Serial.print(outData.headingDegrees);
-        Serial.print(" antenna height: ");
-        Serial.println(_antennaHeightMeters);
         double latRad = outData.latitudeDegrees * DEG2RAD;
         double roll = outData.pitchDegrees * DEG2RAD;
         double heading = outData.headingDegrees * DEG2RAD;
@@ -237,9 +208,9 @@ bool UM982Parser::decodeAgricToPAOGI(const UM982Message &message, UM982PAOGIData
         double east = d * std::cos(heading + M_PI_2);
         double north = d * std::sin(heading + M_PI_2);
 
-        // convert meters → degrees
-        outData.latitudeDegrees = north / METERS_PER_DEG_LAT;
-        outData.longitudeDegrees = east / (METERS_PER_DEG_LAT * std::cos(latRad));
+        // convert meters → degrees and offset the antenna position
+        outData.latitudeDegrees += north / METERS_PER_DEG_LAT;
+        outData.longitudeDegrees += east / (METERS_PER_DEG_LAT * std::cos(latRad));
         outData.altitudeMeters = altGround;
 
     }
@@ -478,22 +449,6 @@ double UM982Parser::readLeDouble(const uint8_t *data)
 {
     double value = 0.0;
     uint8_t buffer[8] = {data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]};
-    memcpy(&value, buffer, sizeof(value));
-    return value;
-}
-
-float UM982Parser::readBeFloat(const uint8_t *data)
-{
-    float value = 0.0f;
-    uint8_t buffer[4] = {data[3], data[2], data[1], data[0]};
-    memcpy(&value, buffer, sizeof(value));
-    return value;
-}
-
-double UM982Parser::readBeDouble(const uint8_t *data)
-{
-    double value = 0.0;
-    uint8_t buffer[8] = {data[7], data[6], data[5], data[4], data[3], data[2], data[1], data[0]};
     memcpy(&value, buffer, sizeof(value));
     return value;
 }
