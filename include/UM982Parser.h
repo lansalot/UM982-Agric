@@ -31,19 +31,19 @@ struct UM982Message
 
 struct UM982PAOGIData
 {
-    uint32_t timeOfFixHms = 0;      // 1
-    double latitudeDegrees = 0.0;   // 2,3 ("N" or "S" hemisphere is determined by the sign of the value, positive for N and negative for S)
-    double longitudeDegrees = 0.0;  // 4,5 ("E" or "W" hemisphere is determined by the sign of the value, positive for E and negative for W)
-    uint8_t fixQuality = 0;         // 6
-    uint8_t satellites = 0;         // 7
-    float hdop = NAN;               // 8
-    float altitudeMeters = NAN;     // 9
-    float dgpsAgeSeconds = NAN;     // 10
-    float speedKnots = NAN;         // 11
-    float headingDegrees = NAN;     // 12
-    float rollDegrees = NAN;        // 13
-    float pitchDegrees = NAN;       // 14
-    float yawRateDegPerSec = NAN;   // 15
+    uint32_t timeOfFixHms = 0;     // 1
+    double latitudeDegrees = 0.0;  // 2,3 ("N" or "S" hemisphere is determined by the sign of the value, positive for N and negative for S)
+    double longitudeDegrees = 0.0; // 4,5 ("E" or "W" hemisphere is determined by the sign of the value, positive for E and negative for W)
+    uint8_t fixQuality = 0;        // 6
+    uint8_t satellites = 0;        // 7
+    float hdop = NAN;              // 8
+    float altitudeMeters = NAN;    // 9
+    float dgpsAgeSeconds = NAN;    // 10
+    float speedKnots = NAN;        // 11
+    float headingDegrees = NAN;    // 12
+    float rollDegrees = NAN;       // 13
+    float pitchDegrees = NAN;      // 14
+    float yawRateDegPerSec = NAN;  // 15
 };
 
 class UM982Parser

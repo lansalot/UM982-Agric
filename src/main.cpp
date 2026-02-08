@@ -23,15 +23,15 @@ void loop()
         const UM982Message &msg = parser.message();
         if (parser.decodeAgricToPAOGI(msg, PAOGIData))
         {
-            // parser.formatPAOGISentence(PAOGIData, PAOGISentence);
-            // Serial.print(PAOGISentence);
+            parser.formatPAOGISentence(PAOGIData, PAOGISentence);
+            //Serial.println(PAOGISentence);
             // Serial.print(" Satellites: ");
             // Serial.print(PAOGIData.satellites);
             // Serial.print("  Parse duration: ");
             // Serial.print(duration);
             // Serial.println(" us");
-            Serial.print(PAOGIData.altitudeMeters, 2);
-            Serial.println(" m");
+            // Serial.print(PAOGIData.altitudeMeters, 2);
+            // Serial.println(" m");
         }
         else
         {
