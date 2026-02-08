@@ -25,6 +25,10 @@ void loop()
         {
             parser.formatPAOGISentence(PAOGIData, PAOGISentence);
             Serial.println(PAOGISentence);
+
+            // You should look into heading status (H+12) as well as rtk status
+
+
             // Serial.print(" Satellites: ");
             // Serial.print(PAOGIData.satellites);
             // Serial.print("  Parse duration: ");

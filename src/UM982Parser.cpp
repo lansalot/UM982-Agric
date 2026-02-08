@@ -186,7 +186,7 @@ bool UM982Parser::decodeAgricToPAOGI(const UM982Message &message, UM982PAOGIData
     outData.altitudeMeters = static_cast<float>(readLeDouble(payload + 96));
 
     outData.hdop = NAN;
-    outData.dgpsAgeSeconds = NAN;
+    outData.dgpsAgeSeconds = readLeFloat(payload + 204); //NAN;
     outData.yawRateDegPerSec = NAN;
 
     // note, rollDegrees is always zero with um982, we use pitch and rotate90 in the config
