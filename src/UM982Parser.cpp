@@ -150,6 +150,7 @@ bool UM982Parser::decodeAgricToPAOGI(const UM982Message &message, UM982PAOGIData
 
     const uint8_t *payload = message.payload;
 
+    // These are your H+x binary offsets in the docs
     const uint8_t hour = payload[8];
     const uint8_t minute = payload[9];
     const uint8_t second = payload[10];
@@ -172,11 +173,17 @@ bool UM982Parser::decodeAgricToPAOGI(const UM982Message &message, UM982PAOGIData
     outData.rollDegrees = readLeFloat(payload + 48);
 
     const float speedMetersPerSecond = readLeFloat(payload + 52);
+    Serial.print("Speed m/s: ");
+    Serial.print(speedMetersPerSecond, 3);
     outData.speedKnots = speedMetersPerSecond * 1.943844f;
 
     outData.latitudeDegrees = readLeDouble(payload + 80);
     outData.longitudeDegrees = readLeDouble(payload + 88);
     outData.altitudeMeters = static_cast<float>(readLeDouble(payload + 96));
+    Serial.print(" Height: ");
+    Serial.print(outData.altitudeMeters, 3);
+    Serial.print(" Antenna height: ");
+    Serial.print(_antennaHeightMeters, 3);
 
     const bool latLonZero = (std::fabs(outData.latitudeDegrees) < 1e-6) && (std::fabs(outData.longitudeDegrees) < 1e-6);
     const bool latLonOutOfRange = (std::fabs(outData.latitudeDegrees) > 90.0) || (std::fabs(outData.longitudeDegrees) > 180.0);

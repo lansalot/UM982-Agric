@@ -12,7 +12,7 @@ void setup()
 {
     Serial.begin(115200);
     SerialGPS.begin(460800);
-    parser.begin(SerialGPS, 3); // 1.5m height
+    parser.begin(SerialGPS, 3); // 3 metres
 }
 
 void loop()
@@ -21,23 +21,17 @@ void loop()
     if (parser.update())
     {
         const UM982Message &msg = parser.message();
-        // Serial.print(millis());
-        // Serial.print(" UM982 message ID: ");
-        // Serial.print(msg.header.messageId);
-        // Serial.print("  Payload length: ");
-        // Serial.print(msg.payloadLength);
-        // Serial.print(" ");
-        // Serial.println(msg.validCrc ? "  CRC valid" : "  CRC invalid");
         if (parser.decodeAgricToPAOGI(msg, PAOGIData))
         {
-            parser.formatPAOGISentence(PAOGIData, PAOGISentence);
-            Serial.print(PAOGISentence);
-            Serial.print(" Satellites: ");
-            Serial.print(PAOGIData.satellites);
-            Serial.print("  Parse duration: ");
-            Serial.print(duration);
-            Serial.println(" us");
-            duration = 0;
+            // parser.formatPAOGISentence(PAOGIData, PAOGISentence);
+            // Serial.print(PAOGISentence);
+            // Serial.print(" Satellites: ");
+            // Serial.print(PAOGIData.satellites);
+            // Serial.print("  Parse duration: ");
+            // Serial.print(duration);
+            // Serial.println(" us");
+            Serial.print(PAOGIData.altitudeMeters, 2);
+            Serial.println(" m");
         }
         else
         {

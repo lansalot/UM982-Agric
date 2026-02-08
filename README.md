@@ -22,20 +22,19 @@ This repository contains a PlatformIO/Arduino C++ parser for UniCore UM982/UM98x
 
 ## Notes
 - AGRIC content may vary by receiver model/firmware (e.g., single-antenna units may report zeros for some fields).
-- Seriously/practically, it's for UM982 dual only, hence the name of the library
-- The `$PAOGI` sentence is a project-specific, GGA-like format for agOpenGPS.
+- No, seriously - it's for UM982 dual only, hence the name of the library
 
 
 ## Performance
 
-Seems speedy enough, decoding in less than 30 microseconds (note values here are zero as I was testing with UM981, my UM982 is away for repair)
+Seems speedy enough, decoding in approx 35 microseconds
 
 ```
-$PAOGI,154732,0000.0000,N,00000.0000,E,0,0,,0.0,,0.0,0.0,0.0,0.0,*65 Satellites: 0  Parse duration: 27 us
-$PAOGI,154732,0000.0000,N,00000.0000,E,0,0,,0.0,,0.0,0.0,0.0,0.0,*65 Satellites: 0  Parse duration: 28 us
-$PAOGI,154732,0000.0000,N,00000.0000,E,0,0,,0.0,,0.0,0.0,0.0,0.0,*65 Satellites: 0  Parse duration: 28 us
-$PAOGI,154732,0000.0000,N,00000.0000,E,0,0,,0.0,,0.0,0.0,0.0,0.0,*65 Satellites: 0  Parse duration: 27 us
-$PAOGI,154732,0000.0000,N,00000.0000,E,0,0,,0.0,,0.0,0.0,0.0,0.0,*65 Satellites: 0  Parse duration: 28 us
+$PAOGI,211144,5729.7208,N,00407.1813,W,1,22,,43.0,,0.0,118.3,0.0,-1.8,*5D Satellites: 22  Parse duration: 35 us
+$PAOGI,211144,5729.7208,N,00407.1813,W,1,22,,43.0,,0.0,117.7,0.0,-1.9,*57 Satellites: 22  Parse duration: 35 us
+$PAOGI,211145,5729.7208,N,00407.1813,W,1,22,,43.0,,0.0,117.7,0.0,-1.6,*59 Satellites: 22  Parse duration: 35 us
+$PAOGI,211145,5729.7208,N,00407.1813,W,1,22,,43.0,,0.0,117.6,0.0,-2.1,*5C Satellites: 22  Parse duration: 35 us
+
 
 ```
 
