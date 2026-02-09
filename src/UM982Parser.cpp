@@ -180,13 +180,16 @@ bool UM982Parser::decodeAgricToPAOGI(const UM982Message &message, UM982PAOGIData
     outData.speedKnots = speedMetersPerSecond * 1.943844f;
 
     outData.latitudeDegrees = readLeDouble(payload + 80);
-    // Serial.print("Lat: ");
-    // Serial.println(outData.latitudeDegrees, 8);
     outData.longitudeDegrees = readLeDouble(payload + 88);
     outData.altitudeMeters = static_cast<float>(readLeDouble(payload + 96));
 
-    outData.hdop = NAN;
-    outData.dgpsAgeSeconds = readLeFloat(payload + 204); //NAN;
+    static float xigema_lat = readLeFloat(payload + 128);
+    static float xigema_lon = readLeFloat(payload + 132);
+    static float h_sum = (xigema_lat * xigema_lat) + (xigema_lon * xigema_lon);
+    static float sigma_uere = 4.5f;
+
+    outData.hdop = std::sqrt(h_sum) / sigma_uere;
+    outData.dgpsAgeSeconds = readLeFloat(payload + 204); // NAN;
     outData.yawRateDegPerSec = NAN;
 
     // note, rollDegrees is always zero with um982, we use pitch and rotate90 in the config
@@ -212,7 +215,6 @@ bool UM982Parser::decodeAgricToPAOGI(const UM982Message &message, UM982PAOGIData
         outData.latitudeDegrees += north / METERS_PER_DEG_LAT;
         outData.longitudeDegrees += east / (METERS_PER_DEG_LAT * std::cos(latRad));
         outData.altitudeMeters = altGround;
-
     }
 
     return true;
