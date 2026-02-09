@@ -51,7 +51,8 @@ class UM982Parser
 public:
     UM982Parser();
 
-    void begin(Stream &input, float antennaHeightMeters = NAN);
+    void begin(HardwareSerial &input, float antennaHeightMeters = NAN);
+    bool isRxBufferEnabled() const;
     void reset();
 
     bool update();
@@ -95,6 +96,8 @@ private:
 
     Stream *_input = nullptr;
     float _antennaHeightMeters = NAN;
+    bool _rxBufferEnabled = false;
+    uint8_t _rxBuffer[2048] = {0};
 
     State _state = State::Sync1;
     size_t _headerIndex = 0;

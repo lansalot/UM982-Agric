@@ -67,12 +67,14 @@ namespace
 
 UM982Parser::UM982Parser() = default;
 
-void UM982Parser::begin(Stream &input, float antennaHeightMeters)
+void UM982Parser::begin(HardwareSerial &input, float antennaHeightMeters)
 {
     _input = &input;
     _antennaHeightMeters = antennaHeightMeters;
     reset();
-
+    input.addMemoryForRead(_rxBuffer, sizeof(_rxBuffer));
+    _rxBufferEnabled = true;
+    Serial.println("Resetting and configuring GPS");
     _input->print("UNLOG\r\n");
     _input->print("CONFIG ANTENNA POWERON\r\n");
     _input->print("CONFIG NMEAVERSION V410\r\n");
@@ -97,8 +99,10 @@ void UM982Parser::begin(Stream &input, float antennaHeightMeters)
     _input->print("CONFIG COM1 460800\r\n");
     _input->print("CONFIG COM2 460800\r\n");
     _input->print("CONFIG COM3 460800\r\n");
-    _input->print("MODE ROVER SURVEY\r\n");
+    //_input->print("MODE ROVER SURVEY\r\n");
+    _input->print("MODE ROVER UAV\r\n");
     _input->print("AGRICB 0.1\r\n");
+    Serial.println("Config finished");
 }
 
 void UM982Parser::reset()
@@ -262,7 +266,7 @@ bool UM982Parser::formatPAOGISentence(const UM982PAOGIData &data, String &outSen
     // you could return this as 8888 to prevent AOG calculating the offset, or better yet antenna height in AOG to 0 (that way roll still shows in AOG)?
     // of course, have to compile antenna height in here temporarily
     // Position.designer.cs #709
-    appendFloat(sentence, data.rollDegrees, 1);
+    appendFloat(sentence, data.pitchDegrees, 1); // this is roll in the um982, but we use pitch and rotate90 in the config, so return it as pitch to AOG
     sentence += ",";
     appendFloat(sentence, data.pitchDegrees, 1);
     sentence += ",";
@@ -272,7 +276,7 @@ bool UM982Parser::formatPAOGISentence(const UM982PAOGIData &data, String &outSen
     char checksumBuffer[6] = {0};
     snprintf(checksumBuffer, sizeof(checksumBuffer), "*%02X", checksum);
     sentence += checksumBuffer;
-
+    sentence += "\r\n";
     outSentence = sentence;
     return true;
 }
@@ -512,4 +516,9 @@ uint8_t UM982Parser::computeNmeaChecksum(const String &sentence)
     }
 
     return checksum;
+}
+
+bool UM982Parser::isRxBufferEnabled() const
+{
+    return _rxBufferEnabled;
 }
