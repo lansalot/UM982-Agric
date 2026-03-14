@@ -99,8 +99,8 @@ void UM982Parser::begin(HardwareSerial &input, float antennaHeightMeters)
     _input->print("CONFIG COM1 460800\r\n");
     _input->print("CONFIG COM2 460800\r\n");
     _input->print("CONFIG COM3 460800\r\n");
-    //_input->print("MODE ROVER SURVEY\r\n");
-    _input->print("MODE ROVER UAV\r\n");
+    _input->print("MODE ROVER SURVEY\r\n");
+//    _input->print("MODE ROVER UAV\r\n");
     _input->print("AGRICB 0.1\r\n");
     Serial.println("Config finished");
 }
@@ -473,11 +473,11 @@ void UM982Parser::formatLatLon(double degrees, bool isLatitude, char *outBuffer,
 
     if (isLatitude)
     {
-        snprintf(outBuffer, outSize, "%02d%07.4f", wholeDegrees, minutes);
+        snprintf(outBuffer, outSize, "%02d%07.8f", wholeDegrees, minutes);
     }
     else
     {
-        snprintf(outBuffer, outSize, "%03d%07.4f", wholeDegrees, minutes);
+        snprintf(outBuffer, outSize, "%03d%07.8f", wholeDegrees, minutes);
     }
 }
 
